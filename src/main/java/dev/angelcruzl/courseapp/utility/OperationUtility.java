@@ -1,16 +1,11 @@
 package dev.angelcruzl.courseapp.utility;
 
-import dev.angelcruzl.courseapp.entity.Instructor;
-import dev.angelcruzl.courseapp.entity.Role;
-import dev.angelcruzl.courseapp.entity.Student;
-import dev.angelcruzl.courseapp.entity.User;
-import dev.angelcruzl.courseapp.repository.InstructorRepository;
-import dev.angelcruzl.courseapp.repository.RoleRepository;
-import dev.angelcruzl.courseapp.repository.StudentRepository;
-import dev.angelcruzl.courseapp.repository.UserRepository;
+import dev.angelcruzl.courseapp.entity.*;
+import dev.angelcruzl.courseapp.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 public class OperationUtility {
   public static void usersOperations(UserRepository userRepository) {
@@ -48,6 +43,19 @@ public class OperationUtility {
     updateStudent(studentRepository);
     deleteStudent(studentRepository);
     fetchStudents(studentRepository);
+  }
+
+  public static void coursesOperations(
+    CourseRepository courseRepository,
+    InstructorRepository instructorRepository,
+    StudentRepository studentRepository
+  ) {
+    createCourses(courseRepository, instructorRepository);
+    updateCourse(courseRepository);
+    deleteCourse(courseRepository);
+    fetchCourses(courseRepository);
+    assignStudentsToCourses(courseRepository, studentRepository);
+    fetchCoursesForStudent(courseRepository);
   }
 
   private static void createUsers(UserRepository userRepository) {
@@ -184,5 +192,58 @@ public class OperationUtility {
 
   private static void fetchStudents(StudentRepository studentRepository) {
     studentRepository.findAll().forEach(student -> System.out.println(student.toString()));
+  }
+
+  private static void createCourses(
+    CourseRepository courseRepository,
+    InstructorRepository instructorRepository
+  ) {
+    Instructor courseInstructor = instructorRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("Instructor not found"));
+    Course javaCourse = new Course(
+      "Java",
+      "Learn from basics to advanced level, following the best practices and making real world projects",
+      "63 Hours",
+      courseInstructor
+    );
+    courseRepository.save(javaCourse);
+
+    Course javascriptCourse = new Course(
+      "Javascript",
+      "Learn from basics to advanced level, following the best practices and making real world projects",
+      "46 Hours",
+      courseInstructor
+    );
+    courseRepository.save(javascriptCourse);
+  }
+
+  private static void updateCourse(CourseRepository courseRepository) {
+    Course courseToUpdate = courseRepository.findById(2L).orElseThrow(() -> new EntityNotFoundException("Course not found"));
+    courseToUpdate.setDescription("Learn the fundamentals of Javascript, make projects and get a job");
+    courseRepository.save(courseToUpdate);
+  }
+
+  private static void deleteCourse(CourseRepository courseRepository) {
+    courseRepository.deleteById(1L);
+  }
+
+  private static void fetchCourses(CourseRepository courseRepository) {
+    courseRepository.findAll().forEach(course -> System.out.println(course.toString()));
+  }
+
+  private static void assignStudentsToCourses(
+    CourseRepository courseRepository,
+    StudentRepository studentRepository
+  ) {
+    Optional<Student> student1 = studentRepository.findById(1L);
+    Optional<Student> student2 = studentRepository.findById(2L);
+    Course javaCourse = courseRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("Course not found"));
+
+    student1.ifPresent(javaCourse::assignStudentToCourse);
+    student2.ifPresent(javaCourse::assignStudentToCourse);
+    courseRepository.save(javaCourse);
+  }
+
+  private static void fetchCoursesForStudent(CourseRepository courseRepository) {
+    courseRepository.getCoursesByStudentId(1L).forEach(course -> System.out.println(course.toString()));
   }
 }
