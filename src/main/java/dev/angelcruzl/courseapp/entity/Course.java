@@ -30,11 +30,11 @@ public class Course {
   @JoinColumn(name = "instructor_id", referencedColumnName = "id", nullable = false)
   private Instructor instructor;
 
-  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
     name = "enrolled_in",
-    joinColumns = { @JoinColumn(name = "id", table = "courses") },
-    inverseJoinColumns = { @JoinColumn(name = "id", table = "students") }
+    joinColumns = { @JoinColumn(name = "course_id", table = "courses") },
+    inverseJoinColumns = { @JoinColumn(name = "student_id", table = "students") }
   )
   private Set<Student> students = new HashSet<>();
 
