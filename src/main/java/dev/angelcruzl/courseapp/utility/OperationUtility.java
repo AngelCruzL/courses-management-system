@@ -2,9 +2,11 @@ package dev.angelcruzl.courseapp.utility;
 
 import dev.angelcruzl.courseapp.entity.Instructor;
 import dev.angelcruzl.courseapp.entity.Role;
+import dev.angelcruzl.courseapp.entity.Student;
 import dev.angelcruzl.courseapp.entity.User;
 import dev.angelcruzl.courseapp.repository.InstructorRepository;
 import dev.angelcruzl.courseapp.repository.RoleRepository;
+import dev.angelcruzl.courseapp.repository.StudentRepository;
 import dev.angelcruzl.courseapp.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -35,6 +37,17 @@ public class OperationUtility {
     updateInstructor(instructorRepository);
     deleteInstructor(instructorRepository);
     fetchInstructors(instructorRepository);
+  }
+
+  public static void studentsOperations(
+    StudentRepository studentRepository,
+    UserRepository userRepository,
+    RoleRepository roleRepository
+  ) {
+    createStudents(studentRepository, userRepository, roleRepository);
+    updateStudent(studentRepository);
+    deleteStudent(studentRepository);
+    fetchStudents(studentRepository);
   }
 
   private static void createUsers(UserRepository userRepository) {
@@ -137,5 +150,39 @@ public class OperationUtility {
 
   private static void fetchInstructors(InstructorRepository instructorRepository) {
     instructorRepository.findAll().forEach(instructor -> System.out.println(instructor.toString()));
+  }
+
+  private static void createStudents(
+    StudentRepository studentRepository,
+    UserRepository userRepository,
+    RoleRepository roleRepository
+  ) {
+    Role studentRole = roleRepository.findByName("STUDENT");
+    if (studentRole == null) throw new EntityNotFoundException("Role not found");
+
+    User angelUser = new User("angel@cruz.com", "secret123");
+    angelUser.assignRoleToUser(studentRole);
+    userRepository.save(angelUser);
+    Student angelStudent = new Student("Angel", "Cruz", "Frontend MidLevel", angelUser);
+    studentRepository.save(angelStudent);
+
+    User luisUser = new User("luis@lara.com", "secret123");
+    luisUser.assignRoleToUser(studentRole);
+    userRepository.save(luisUser);
+    Student luisStudent = new Student("Luis", "Lara", "Junior backend developer", luisUser);
+    studentRepository.save(luisStudent);
+  }
+
+  private static void updateStudent(StudentRepository studentRepository) {
+    Student studentToUpdate = studentRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("Student not found"));
+    studentToUpdate.setLevel("Senior frontend developer");
+  }
+
+  private static void deleteStudent(StudentRepository studentRepository) {
+    studentRepository.deleteById(2L);
+  }
+
+  private static void fetchStudents(StudentRepository studentRepository) {
+    studentRepository.findAll().forEach(student -> System.out.println(student.toString()));
   }
 }
