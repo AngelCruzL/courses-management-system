@@ -1,15 +1,36 @@
 package dev.angelcruzl.courseapp.entity;
 
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
+@Table(name = "students")
 public class Student {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
+
+  @Basic
+  @Column(name = "first_name", nullable = false, length = 50)
   private String firstName;
+
+  @Basic
+  @Column(name = "last_name", nullable = false, length = 50)
   private String lastName;
+
+  @Basic
+  @Column(name = "level", nullable = false, length = 64)
   private String level;
+
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "students")
   private Set<Course> courses = new HashSet<>();
+
+  @OneToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private User user;
 
   public Student(
