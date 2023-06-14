@@ -1,15 +1,41 @@
 package dev.angelcruzl.courseapp.entity;
 
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
+@Table(name = "courses")
 public class Course {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
   private Long id;
+
+  @Basic
+  @Column(name = "title", nullable = false, length = 100)
   private String title;
+
+  @Basic
+  @Column(name = "description", nullable = false, length = 250)
   private String description;
+
+  @Basic
+  @Column(name = "duration", nullable = false, length = 18)
   private String duration;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "instructor_id", referencedColumnName = "id", nullable = false)
   private Instructor instructor;
+
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses")
+  @JoinTable(
+    name = "enrolled_in",
+    joinColumns = { @JoinColumn(name = "id", table = "courses") },
+    inverseJoinColumns = { @JoinColumn(name = "id", table = "students") }
+  )
   private Set<Student> students = new HashSet<>();
 
   public Course(
@@ -25,6 +51,16 @@ public class Course {
   }
 
   public Course() {
+  }
+
+  public void assignStudentToCourse(Student student){
+    this.students.add(student);
+    student.getCourses().add(this);
+  }
+
+  public void removeStudentFromCourse(Student student){
+    this.students.remove(student);
+    student.getCourses().remove(this);
   }
 
   @Override
