@@ -7,8 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface CourseRepository extends JpaRepository<Course,Long> {
-  List<Course> findCoursesByCourseNameContains(String keyword);
+public interface CourseRepository extends JpaRepository<Course, Long> {
+  List<Course> findCoursesByTitleContains(String keyword);
 
   @Query(value = "SELECT * FROM courses AS c WHERE c.id IN (SELECT e.course_id FROM enrolled_in AS e WHERE e.student_id =:studentId)", nativeQuery = true)
   List<Course> getCoursesByStudentId(@Param("studentId") Long studentId);
