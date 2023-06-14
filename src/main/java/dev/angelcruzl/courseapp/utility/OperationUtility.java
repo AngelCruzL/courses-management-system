@@ -1,7 +1,9 @@
 package dev.angelcruzl.courseapp.utility;
 
+import dev.angelcruzl.courseapp.entity.Instructor;
 import dev.angelcruzl.courseapp.entity.Role;
 import dev.angelcruzl.courseapp.entity.User;
+import dev.angelcruzl.courseapp.repository.InstructorRepository;
 import dev.angelcruzl.courseapp.repository.RoleRepository;
 import dev.angelcruzl.courseapp.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,6 +24,17 @@ public class OperationUtility {
     deleteRole(roleRepository);
     fetchRoles(roleRepository);
     assignRolesToUsers(roleRepository, userRepository);
+  }
+
+  public static void instructorsOperations(
+    InstructorRepository instructorRepository,
+    UserRepository userRepository,
+    RoleRepository roleRepository
+  ) {
+    createInstructors(instructorRepository, userRepository, roleRepository);
+    updateInstructor(instructorRepository);
+    deleteInstructor(instructorRepository);
+    fetchInstructors(instructorRepository);
   }
 
   private static void createUsers(UserRepository userRepository) {
@@ -88,5 +101,41 @@ public class OperationUtility {
       user.assignRoleToUser(role);
       userRepository.save(user);
     });
+  }
+
+  public static void createInstructors(
+    InstructorRepository instructorRepository,
+    UserRepository userRepository,
+    RoleRepository roleRepository
+  ) {
+    Role instructorRole = roleRepository.findByName("INSTRUCTOR");
+
+    if (instructorRole == null) throw new EntityNotFoundException("Role not found");
+
+    User armandoUser = new User("armando@instructor.com", "secret123");
+    armandoUser.assignRoleToUser(instructorRole);
+    userRepository.save(armandoUser);
+    Instructor armandoInstructor = new Instructor("Armando", "Lopez", "The best instructor ever", armandoUser);
+    instructorRepository.save(armandoInstructor);
+
+    User victorUser = new User("victor@instructor.com", "secret123");
+    victorUser.assignRoleToUser(instructorRole);
+    userRepository.save(victorUser);
+    Instructor victorInstructor = new Instructor("Victor", "Lopez", "My favorite instructor ever", victorUser);
+    instructorRepository.save(victorInstructor);
+  }
+
+  private static void updateInstructor(InstructorRepository instructorRepository) {
+    Instructor instructorToUpdate = instructorRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("Instructor not found"));
+    instructorToUpdate.setSummary("Recently certified in cloud technologies");
+    instructorRepository.save(instructorToUpdate);
+  }
+
+  private static void deleteInstructor(InstructorRepository instructorRepository) {
+    instructorRepository.deleteById(2L);
+  }
+
+  private static void fetchInstructors(InstructorRepository instructorRepository) {
+    instructorRepository.findAll().forEach(instructor -> System.out.println(instructor.toString()));
   }
 }
