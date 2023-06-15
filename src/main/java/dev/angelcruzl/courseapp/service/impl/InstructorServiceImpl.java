@@ -10,13 +10,17 @@ import dev.angelcruzl.courseapp.service.CourseService;
 import dev.angelcruzl.courseapp.service.InstructorService;
 import dev.angelcruzl.courseapp.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class InstructorServiceImpl implements InstructorService {
   private final InstructorRepository instructorRepository;
   private final InstructorMapper instructorMapper;
