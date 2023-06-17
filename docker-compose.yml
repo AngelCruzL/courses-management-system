@@ -13,4 +13,5 @@ services:
       MYSQL_PASSWORD: Secret123
     volumes:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql-data:/var/lib/mysql
     command: --init-file /docker-entrypoint-initdb.d/init.sql
